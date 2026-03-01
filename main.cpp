@@ -1,6 +1,7 @@
 #include <iostream>
 #include <conio.h>
 #include <vector>
+#include "query.h"
 
 using namespace std;
 
@@ -25,13 +26,14 @@ int main() {
     string userInput;
     
     while (choice != exit_program) {
+        clearTerminal();
+
         cout << ":";
 
         getline(cin, userInput);
 
         choice = getChoice(userInput);
 
-        clearTerminal();
 
         switch (choice) {
             case exit_program: exit;
@@ -52,13 +54,7 @@ Choice getChoice(string choiceInput) {
 }
 
 void searchKnowledgeBase(string searchInput) {
-    // To-Do: fuzzy search knowledge base and show
-    // results (might move to another file)
-    vector<string> searchResults = {
-        "copying working directory in windows",
-        "traversing a binary tree",
-        "copying working directory in windows"
-    };
+    vector<string> searchResults = queryKnowledgeBase(searchInput);
 
     clearTerminal();
 
@@ -95,18 +91,10 @@ void searchKnowledgeBase(string searchInput) {
     showSelectedOutput(searchResults.at(lineIndex));
 }
 
-
-
-// Move cursor up 1 line
-// std::cout << "\033[1A";
-// Move cursor down 1 line
-// std::cout << "\033[1B";
-// Move cursor right 1 position
-// std::cout << "\033[1C";
-
-
 void showSelectedOutput(string resultsID) {
     clearTerminal();
+
+    // To-Do: access content corrisponding to the key
 
     cout << resultsID << endl;
     cout << "example data" << endl;
