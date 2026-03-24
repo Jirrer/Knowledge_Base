@@ -17,7 +17,7 @@ enum Choice {
 void clearTerminal();
 Choice getChoice(string choiceInput);
 void searchKnowledgeBase(string searchInput);
-void showSelectedOutput(string resultsID);
+void showSelectedOutput(string domainName);
 void addToKnowledgeBase();
 bool pushChanges(string name, string category, vector<string> text);
 
@@ -105,13 +105,14 @@ void searchKnowledgeBase(string searchInput) {
 
 }
 
-void showSelectedOutput(string resultsID) {
+void showSelectedOutput(string domainName) {
     clearTerminal();
 
     // To-Do: access content corrisponding to the key
 
-    cout << resultsID << endl;
-    cout << "example data" << endl;
+    cout << domainName << endl;
+
+    cout << pullContentFromKeys(domainName) << endl;
 
     cout << "<-- Return";
 

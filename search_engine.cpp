@@ -13,6 +13,7 @@ struct Domain {
     string category;
     string firstCode;
     string secondCode;
+    string content;
 };
 
 vector<Domain> pullAllDomains();
@@ -43,23 +44,18 @@ vector<string> queryKnowledgeBase(const string& searchInput) {
     return output;
 }
 
-vector<Domain> pullAllDomains() {
-    // dev data
-    vector<string> searchResults = {
-        "CoPpying working directory in windows",
-        "trAversing a binary tree",
-        "copying working directory in windows",
-        "arranging in python"
-    }; 
+vector<Domain> pullAllDomains() { // To-Do: refactor domain struct and this method
+    vector<tuple<string, string>> domainAndCategories = pullDomainAndCategories();
 
     vector<Domain> output;
 
-    for (string domain : searchResults) {
+    for (tuple<string, string> domainAndCategory : domainAndCategories) {
         Domain procressedDomain;
 
-        tuple<string, string> metephoneCodesPair = getMetephoneCode(domain);
+        tuple<string, string> metephoneCodesPair = getMetephoneCode("test");
         
-        procressedDomain.name = domain;
+        procressedDomain.name = get<0>(domainAndCategory);
+        procressedDomain.category = get<1>(domainAndCategory);
         procressedDomain.firstCode = get<0>(metephoneCodesPair);
         procressedDomain.secondCode= get<1>(metephoneCodesPair);
 
