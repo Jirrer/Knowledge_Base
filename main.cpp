@@ -15,6 +15,8 @@ enum Choice {
 
 // To-Do: add a quite hotkey (crl+c) for any and all input
 // To-Do: add search algorithm
+// To-Do: change the name for 'add'
+// To-Do: add 'esc' as a back button
 
 void clearTerminal();
 Choice getChoice(string choiceInput);
@@ -129,9 +131,9 @@ void showSelectedOutput(string domainName) {
 
     // To-Do: access content corrisponding to the key
 
-    cout << domainName << endl;
+    cout << domainName << endl << endl;
 
-    cout << pullContentFromKeys(domainName) << endl;
+    cout << pullContentFromKeys(domainName) << endl << endl;
 
     cout << "<-- Return";
 
@@ -161,9 +163,6 @@ void addToKnowledgeBase() {
     while (getline(cin, line) && line != ".") {
         text.push_back(line);
     }
-
-    cout << name << endl;
-    cout << category << endl;
  
     if (pushChanges(name, category, text)) { cout << "Successfully Added" << endl; }
     else { cout << "Error Trying to Add" << endl; }
