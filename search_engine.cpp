@@ -4,7 +4,7 @@
 #include <algorithm> 
 #include <cctype>
 #include <iterator>
-// #include <sqlite3.h> // change to its own file later
+#include "database.h"
 
 using namespace std;
 
