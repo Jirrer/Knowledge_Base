@@ -43,10 +43,10 @@ int main() {
         choice = getChoice(userInput);
 
         switch (choice) {
-            case exit_program: exit(1);
-            case add: addToKnowledgeBase();
-            case search_by_category: searchKnowledgeBase(queryKnowledgeBaseByCategory(userInput));
-            case search_base: searchKnowledgeBase(queryKnowledgeBase(userInput)); 
+            case exit_program: exit(1); break;
+            case add: addToKnowledgeBase(); break;
+            case search_by_category: searchKnowledgeBase(queryKnowledgeBaseByCategory(userInput)); break;
+            case search_base: searchKnowledgeBase(queryKnowledgeBase(userInput)); break;
         }
     }
 
@@ -76,6 +76,20 @@ void searchKnowledgeBase(vector<string> searchResults) {
     clearTerminal();
 
     cout << "*** Search Results ***" << endl;
+
+    if (searchResults.size() == 0) {
+        cout << "No Results Found" << endl;
+
+        cout << "<-- Return";
+
+        while (true) {
+            char input = _getch();
+
+            if (input == '\r') {
+                return;
+        }
+    }
+    }
 
     for (string result : searchResults) {
         cout << result << endl;
