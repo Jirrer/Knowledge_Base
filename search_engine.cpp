@@ -17,6 +17,7 @@ struct Domain {
 };
 
 vector<Domain> pullAllDomains();
+vector<Domain> pullDomainsByCategory(string category);
 tuple<string, string> getMetephoneCode(string text);
 
 vector<string> queryKnowledgeBase(const string& searchInput) {
@@ -44,8 +45,57 @@ vector<string> queryKnowledgeBase(const string& searchInput) {
     return output;
 }
 
+vector<string> queryKnowledgeBaseByCategory(const string& searchInput) {
+    string processedSearchInput = searchInput.substr(2); 
+
+    vector<Domain> domainsByCategory = pullDomainsByCategory(processedSearchInput);
+
+    tuple<string, string> searchMetephoneCodes = getMetephoneCode(processedSearchInput);
+
+    string searchFirstCode = get<0>(getMetephoneCode(processedSearchInput));
+    string searchSecondCode = get<1>(getMetephoneCode(processedSearchInput));
+
+    vector<string> output;
+    for (Domain domain : domainsByCategory) { // To-Do: fix the loop
+        if ((domain.firstCode.size() > 0) && domain.firstCode == searchFirstCode) {
+            output.push_back(domain.name);
+
+        } else if ((domain.firstCode != "") && domain.firstCode == searchSecondCode) {
+            output.push_back(domain.name);
+        }
+
+        else if ((domain.secondCode.size() > 0 && domain.secondCode.size() > 0) && domain.secondCode == searchSecondCode) {
+            output.push_back(domain.name);
+        }
+    }
+    
+    return output;
+}
+
 vector<Domain> pullAllDomains() { // To-Do: refactor domain struct and this method
     vector<tuple<string, string>> domainAndCategories = pullDomainAndCategories();
+
+    vector<Domain> output;
+
+    for (tuple<string, string> domainAndCategory : domainAndCategories) {
+        Domain procressedDomain;
+
+        tuple<string, string> metephoneCodesPair = getMetephoneCode("test");
+        
+        procressedDomain.name = get<0>(domainAndCategory);
+        procressedDomain.category = get<1>(domainAndCategory);
+        procressedDomain.firstCode = get<0>(metephoneCodesPair);
+        procressedDomain.secondCode= get<1>(metephoneCodesPair);
+
+        output.push_back(procressedDomain);
+    }
+
+    return output;
+    
+}
+
+vector<Domain> pullDomainsByCategory(string category) { // To-Do: refactor domain struct and this method
+    vector<tuple<string, string>> domainAndCategories = pullDomainAndCategoriesByCategory(category);
 
     vector<Domain> output;
 

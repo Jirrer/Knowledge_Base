@@ -73,6 +73,44 @@ vector<tuple<string, string>> pullDomainAndCategories() {
     return output;
 }
 
+vector<tuple<string, string>> pullDomainAndCategoriesByCategory(string categoryInput) {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+
+    vector<tuple<string, string>> output;
+
+    if (sqlite3_open("Knowledge_Base.db", &db)) {
+        return output;
+    }
+
+    const char* sql = 
+        "SELECT domain, category FROM keys WHERE category = ?;";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        sqlite3_close(db);
+        return output;
+    }
+
+    sqlite3_bind_text(stmt, 1, categoryInput.c_str(), -1, SQLITE_TRANSIENT);
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        string domain = sqlite3_column_text(stmt, 0)
+            ? (const char*)sqlite3_column_text(stmt, 0)
+            : "";
+
+        string category = sqlite3_column_text(stmt, 1)
+            ? (const char*)sqlite3_column_text(stmt, 1)
+            : "";
+
+        output.emplace_back(domain, category);
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    return output;
+}
+
 string pullContentFromKeys(string domainKey) {
     sqlite3* db;
     sqlite3_stmt* stmt;

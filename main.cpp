@@ -10,13 +10,15 @@ enum Choice {
     exit_program,
     search_base,
     add,
+    search_by_category,
 };
 
 // To-Do: add a quite hotkey (crl+c) for any and all input
+// To-Do: add search algorithm
 
 void clearTerminal();
 Choice getChoice(string choiceInput);
-void searchKnowledgeBase(string searchInput);
+void searchKnowledgeBase(vector<string> searchResults);
 void showSelectedOutput(string domainName);
 void addToKnowledgeBase();
 bool pushChanges(string name, string category, vector<string> text);
@@ -43,7 +45,8 @@ int main() {
         switch (choice) {
             case exit_program: exit(1);
             case add: addToKnowledgeBase();
-            case search_base: searchKnowledgeBase(userInput); 
+            case search_by_category: searchKnowledgeBase(queryKnowledgeBaseByCategory(userInput));
+            case search_base: searchKnowledgeBase(queryKnowledgeBase(userInput)); 
         }
     }
 
@@ -59,15 +62,17 @@ Choice getChoice(string choiceInput) {
         return Choice::add;
     
     } 
+
+    else if (choiceInput[0] == '_' && choiceInput[1] == '_') {
+        return Choice::search_by_category;
+    }
     
     else {
         return Choice::search_base;
     }
 }
 
-void searchKnowledgeBase(string searchInput) {
-    vector<string> searchResults = queryKnowledgeBase(searchInput);
-
+void searchKnowledgeBase(vector<string> searchResults) {
     clearTerminal();
 
     cout << "*** Search Results ***" << endl;
