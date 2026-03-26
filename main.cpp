@@ -24,19 +24,62 @@ enum Direction_Choice {
 // To-Do: change the name for 'add'
 // To-Do: make it so adding text (or editing in the future) acts a text editior
 
+// Helper Methods
 void clearTerminal();
 User_Choice getChoice(string choiceInput);
+Direction_Choice getDirectionChoice();
+
+// Methods After Main
 void searchKnowledgeBase(vector<string> searchResults);
 void showSelectedOutput(string domainName, vector<string> oldSearchResults);
 void addToKnowledgeBase();
 bool pushChanges(string name, string category, vector<string> text);
-Direction_Choice getDirectionChoice();
 void printHelpLibrary();
 
 void clearTerminal() {
     // To-Do: accept linux as an option
 
     system("cls");
+}
+
+User_Choice getChoice(string choiceInput) {
+    if (choiceInput == "leave") {
+        return User_Choice::exit_program;
+    }
+
+    else if (choiceInput == "add") {
+        return User_Choice::add;
+    } 
+
+    else if (choiceInput[0] == '_' && choiceInput[1] == '_') {
+        return User_Choice::search_by_category;
+    }
+
+    else if (choiceInput.size() == 1 && choiceInput[0] == '?') {
+        return User_Choice::help;
+    }
+    
+    else {
+        return User_Choice::search_base;
+    }
+}
+
+Direction_Choice getDirectionChoice() {
+    while (true) {
+        char input = _getch();
+
+        if (input == '\r') { // enter
+            return Direction_Choice::in;
+        } 
+
+        else if (input == 27) { // esc
+            return Direction_Choice::out;
+        }
+
+        else if (input == 3) { // ctrl+c
+            exit(0); // To-Do: maybe clear terminal here
+        }
+    }
 }
 
 int main() {
@@ -64,28 +107,6 @@ int main() {
     return 0;
 }
 
-User_Choice getChoice(string choiceInput) {
-    if (choiceInput == "leave") {
-        return User_Choice::exit_program;
-    }
-
-    else if (choiceInput == "add") {
-        return User_Choice::add;
-    } 
-
-    else if (choiceInput[0] == '_' && choiceInput[1] == '_') {
-        return User_Choice::search_by_category;
-    }
-
-    else if (choiceInput.size() == 1 && choiceInput[0] == '?') {
-        return User_Choice::help;
-    }
-    
-    else {
-        return User_Choice::search_base;
-    }
-}
-
 void searchKnowledgeBase(vector<string> searchResults) {
     clearTerminal();
 
@@ -107,7 +128,7 @@ void searchKnowledgeBase(vector<string> searchResults) {
         cout << result << endl;
     }
 
-    cout << "\033[2;1H";
+    cout << "\033[2;1H" << "\033[" << searchResults[0].size() << "C";
 
     int lineIndex = 0;
     while (true) {
@@ -116,8 +137,6 @@ void searchKnowledgeBase(vector<string> searchResults) {
         if (keySelection == 27) { return; } // esc
         if (keySelection == 3) { clearTerminal(); exit(0); } // ctrl+c
         if (keySelection == 13) { break; } // enter
-
-        // To-Do: put cursor at the end of the text
         
         if (keySelection == 0 || keySelection == 224) {
             int arrowDirection = _getch();
@@ -130,6 +149,9 @@ void searchKnowledgeBase(vector<string> searchResults) {
                 lineIndex++; 
                 cout << "\033[1B";
             } 
+            
+            cout << "\r";
+            cout << "\033[" << searchResults[lineIndex].size() << "C";
         }
     }
 
@@ -197,24 +219,6 @@ bool pushChanges(string name, string category, vector<string> text) {
     tuple<string, string, string> payload(name, category, content);
 
     return insertIntoKeys(payload);
-}
-
-Direction_Choice getDirectionChoice() {
-    while (true) {
-        char input = _getch();
-
-        if (input == '\r') { // enter
-            return Direction_Choice::in;
-        } 
-
-        else if (input == 27) { // esc
-            return Direction_Choice::out;
-        }
-
-        else if (input == 3) { // ctrl+c
-            exit(0); // To-Do: maybe clear terminal here
-        }
-    }
 }
 
 void printHelpLibrary() { // To-Do: add a specific help (like help python)
