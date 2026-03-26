@@ -11,6 +11,7 @@ enum User_Choice {
     search_base,
     add,
     search_by_category,
+    help,
 };
 
 enum Direction_Choice {
@@ -19,10 +20,8 @@ enum Direction_Choice {
     leave,   
 };
 
-// To-Do: add a quite hotkey (crl+c) for any and all input
 // To-Do: add search algorithm
 // To-Do: change the name for 'add'
-// To-Do: add 'esc' as a back button
 // To-Do: make it so adding text (or editing in the future) acts a text editior
 
 void clearTerminal();
@@ -32,6 +31,7 @@ void showSelectedOutput(string domainName, vector<string> oldSearchResults);
 void addToKnowledgeBase();
 bool pushChanges(string name, string category, vector<string> text);
 Direction_Choice getDirectionChoice();
+void printHelpLibrary();
 
 void clearTerminal() {
     // To-Do: accept linux as an option
@@ -56,6 +56,7 @@ int main() {
             case exit_program: exit(1); break;
             case add: addToKnowledgeBase(); break;
             case search_by_category: searchKnowledgeBase(queryKnowledgeBaseByCategory(userInput)); break;
+            case help: printHelpLibrary(); break;
             case search_base: searchKnowledgeBase(queryKnowledgeBase(userInput)); break;
         }
     }
@@ -70,11 +71,14 @@ User_Choice getChoice(string choiceInput) {
 
     else if (choiceInput == "add") {
         return User_Choice::add;
-    
     } 
 
     else if (choiceInput[0] == '_' && choiceInput[1] == '_') {
         return User_Choice::search_by_category;
+    }
+
+    else if (choiceInput.size() == 1 && choiceInput[0] == '?') {
+        return User_Choice::help;
     }
     
     else {
@@ -109,8 +113,9 @@ void searchKnowledgeBase(vector<string> searchResults) {
     while (true) {
         int keySelection = _getch();
         
-        if (keySelection == 3) { clearTerminal(); exit(0); }
-        if (keySelection == 13) { break; }
+        if (keySelection == 27) { return; } // esc
+        if (keySelection == 3) { clearTerminal(); exit(0); } // ctrl+c
+        if (keySelection == 13) { break; } // enter
 
         // To-Do: put cursor at the end of the text
         
@@ -169,9 +174,8 @@ void addToKnowledgeBase() {
     if (pushChanges(name, category, text)) { cout << "Successfully Added" << endl; }
     else { cout << "Error Trying to Add" << endl; }
 
-    Direction_Choice choice = getDirectionChoice();
 
-    if (choice == Direction_Choice::in || choice == Direction_Choice::out) {
+    if (getDirectionChoice()) {
         return;
     }
 }
@@ -199,16 +203,31 @@ Direction_Choice getDirectionChoice() {
     while (true) {
         char input = _getch();
 
-        if (input == '\r') {
+        if (input == '\r') { // enter
             return Direction_Choice::in;
         } 
 
-        else if (input == 27) {
+        else if (input == 27) { // esc
             return Direction_Choice::out;
         }
 
-        else if (input == 3) {
+        else if (input == 3) { // ctrl+c
             exit(0); // To-Do: maybe clear terminal here
         }
+    }
+}
+
+void printHelpLibrary() { // To-Do: add a specific help (like help python)
+    clearTerminal(); 
+
+    cout << "*** Help Library ***" << endl << endl;
+    cout << "(?) - Show Help Library" << endl;
+    cout << "(Example Search) - Search Knowledge Base" << endl;
+    cout << "(__exampleCategory) - Search by category" << endl;
+    cout << "(crtl+c) - End Program" << endl;
+    cout << "(add) - Add New Entry" << endl;
+
+    if (getDirectionChoice()) {
+        return;
     }
 }
