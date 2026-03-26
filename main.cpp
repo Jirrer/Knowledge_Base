@@ -6,24 +6,32 @@
 
 using namespace std;
 
-enum Choice {
+enum User_Choice {
     exit_program,
     search_base,
     add,
     search_by_category,
 };
 
+enum Direction_Choice {
+    in,
+    out,
+    leave,   
+};
+
 // To-Do: add a quite hotkey (crl+c) for any and all input
 // To-Do: add search algorithm
 // To-Do: change the name for 'add'
 // To-Do: add 'esc' as a back button
+// To-Do: make it so adding text (or editing in the future) acts a text editior
 
 void clearTerminal();
-Choice getChoice(string choiceInput);
+User_Choice getChoice(string choiceInput);
 void searchKnowledgeBase(vector<string> searchResults);
-void showSelectedOutput(string domainName);
+void showSelectedOutput(string domainName, vector<string> oldSearchResults);
 void addToKnowledgeBase();
 bool pushChanges(string name, string category, vector<string> text);
+Direction_Choice getDirectionChoice();
 
 void clearTerminal() {
     // To-Do: accept linux as an option
@@ -32,7 +40,7 @@ void clearTerminal() {
 }
 
 int main() {
-    enum Choice choice;
+    enum User_Choice choice;
     string userInput;
     
     while (choice != exit_program) {
@@ -55,22 +63,22 @@ int main() {
     return 0;
 }
 
-Choice getChoice(string choiceInput) {
+User_Choice getChoice(string choiceInput) {
     if (choiceInput == "leave") {
-        return Choice::exit_program;
+        return User_Choice::exit_program;
     }
 
     else if (choiceInput == "add") {
-        return Choice::add;
+        return User_Choice::add;
     
     } 
 
     else if (choiceInput[0] == '_' && choiceInput[1] == '_') {
-        return Choice::search_by_category;
+        return User_Choice::search_by_category;
     }
     
     else {
-        return Choice::search_base;
+        return User_Choice::search_base;
     }
 }
 
@@ -84,13 +92,11 @@ void searchKnowledgeBase(vector<string> searchResults) {
 
         cout << "<-- Return";
 
-        while (true) {
-            char input = _getch();
+        Direction_Choice choice = getDirectionChoice();
 
-            if (input == '\r') {
-                return;
+        if (choice == Direction_Choice::in || choice == Direction_Choice::out) {
+            return;
         }
-    }
     }
 
     for (string result : searchResults) {
@@ -102,7 +108,8 @@ void searchKnowledgeBase(vector<string> searchResults) {
     int lineIndex = 0;
     while (true) {
         int keySelection = _getch();
-
+        
+        if (keySelection == 3) { clearTerminal(); exit(0); }
         if (keySelection == 13) { break; }
 
         // To-Do: put cursor at the end of the text
@@ -121,29 +128,24 @@ void searchKnowledgeBase(vector<string> searchResults) {
         }
     }
 
-    if (searchResults.size() > 0) { showSelectedOutput(searchResults.at(lineIndex)); }
-    else {showSelectedOutput(""); }
+    if (searchResults.size() > 0) { showSelectedOutput(searchResults.at(lineIndex), searchResults); }
+    else {showSelectedOutput("", searchResults); }
 
 }
 
-void showSelectedOutput(string domainName) {
+void showSelectedOutput(string domainName, vector<string> oldSearchResults) {
     clearTerminal();
-
-    // To-Do: access content corrisponding to the key
 
     cout << domainName << endl << endl;
 
     cout << pullContentFromKeys(domainName) << endl << endl;
 
-    cout << "<-- Return";
+    cout << "-- New Search --";
 
-    while (true) {
-        char input = _getch();
+    Direction_Choice choice = getDirectionChoice();
 
-        if (input == '\r') {
-            return;
-        }
-    }
+    if (choice == Direction_Choice::in) { return; }
+    if (choice == Direction_Choice::out) { searchKnowledgeBase(oldSearchResults); }
 }
 
 void addToKnowledgeBase() {
@@ -157,7 +159,7 @@ void addToKnowledgeBase() {
     cout << "Enter Category: ";
     getline(cin, category);
 
-    cout << "Enter Text Contnet (enter '.' to end) -->" << endl;
+    cout << "Enter Text content (enter '.' to end) -->" << endl;
     
     string line;
     while (getline(cin, line) && line != ".") {
@@ -167,12 +169,10 @@ void addToKnowledgeBase() {
     if (pushChanges(name, category, text)) { cout << "Successfully Added" << endl; }
     else { cout << "Error Trying to Add" << endl; }
 
-    while (true) {
-        char input = _getch();
+    Direction_Choice choice = getDirectionChoice();
 
-        if (input == '\r') {
-            return;
-        }
+    if (choice == Direction_Choice::in || choice == Direction_Choice::out) {
+        return;
     }
 }
 
@@ -193,4 +193,22 @@ bool pushChanges(string name, string category, vector<string> text) {
     tuple<string, string, string> payload(name, category, content);
 
     return insertIntoKeys(payload);
+}
+
+Direction_Choice getDirectionChoice() {
+    while (true) {
+        char input = _getch();
+
+        if (input == '\r') {
+            return Direction_Choice::in;
+        } 
+
+        else if (input == 27) {
+            return Direction_Choice::out;
+        }
+
+        else if (input == 3) {
+            exit(0); // To-Do: maybe clear terminal here
+        }
+    }
 }
