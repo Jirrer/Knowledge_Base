@@ -5,6 +5,7 @@
 #include "query.h"
 #include "database.h"
 #include <cstdlib>
+#include "text_editor.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ enum Direction_Choice {
 // To-Do: add search algorithm
 // To-Do: make it so adding text (or editing in the future) acts a text editior
 // To-Do: add delete entry
+// To-DO: normilize text before generating methephone codes
 
 // Helper Methods
 void clearTerminal();
