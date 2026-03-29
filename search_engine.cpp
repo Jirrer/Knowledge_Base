@@ -5,6 +5,8 @@
 #include <cctype>
 #include <iterator>
 #include "database.h"
+#include "double_metaphone.h"
+#include <sstream>
 
 using namespace std;
 
@@ -17,39 +19,36 @@ struct Domain {
 };
 
 // Helper Methods
-tuple<string, string> getMetephoneCode(string text);
+tuple<string, string> getMetephoneCode(const string& text);
 
 // Private Methods
 vector<Domain> pullAllDomains();
 vector<Domain> pullDomainsByCategory(string category);
+vector<string> tokenize(const string& text);
 
 // To-Do: a lot of refactoring and abstracting
 
-tuple<string, string> getMetephoneCode(string text) {
-    // vector<char> vowels = {'A', 'E', 'I', 'O', 'U', 'W', 'Y'};
 
+tuple<string, string> getMetephoneCode(const string& text) {
+    vector<string> codes;
 
+    DoubleMetaphone(text, &codes);
 
-
-    // string firstCode[4];
-    // string secondCode[4];
-
-    // transform(text.begin(), text.end(), text.begin(),
-    //         [](unsigned char c){ return tolower(c); });
-
-    // for (int i = 0; i < text.length(); i++) {
-    //     if ((i == 0) && (find(vowels.begin(), vowels.end(), toupper(text[i])) != vowels.end())) {
-    //         firstCode[0] = 'A';
-    //     }
-    // }
-
-    // string firstCodeStr = firstCode;
-
-    tuple<string, string> output = make_tuple("1111", "1111");
-    
-    return output;
-
+    return make_tuple(codes[0], codes[1]);
 }
+
+vector<string> tokenize(const string& text) {
+    vector<string> tokens;
+    stringstream ss(text);
+    string word;
+
+    while (ss >> word) {
+        tokens.push_back(word);
+    }
+
+    return tokens;
+}
+
 
 vector<Domain> pullAllDomains() { // To-Do: refactor domain struct and this method
     vector<tuple<string, string>> domainAndCategories = pullDomainAndCategories();
@@ -59,9 +58,10 @@ vector<Domain> pullAllDomains() { // To-Do: refactor domain struct and this meth
     for (tuple<string, string> domainAndCategory : domainAndCategories) {
         Domain procressedDomain;
 
-        tuple<string, string> metephoneCodesPair = getMetephoneCode("test");
-        
         procressedDomain.name = get<0>(domainAndCategory);
+
+        tuple<string, string> metephoneCodesPair = getMetephoneCode(procressedDomain.name);
+        
         procressedDomain.category = get<1>(domainAndCategory);
         procressedDomain.firstCode = get<0>(metephoneCodesPair);
         procressedDomain.secondCode= get<1>(metephoneCodesPair);
@@ -97,26 +97,53 @@ vector<Domain> pullDomainsByCategory(string category) { // To-Do: refactor domai
 
 vector<string> queryKnowledgeBase(const string& searchInput) {
     vector<Domain> allDomains = pullAllDomains();
+    vector<string> searchWords = tokenize(searchInput);
 
-    tuple<string, string> searchMetephoneCodes = getMetephoneCode(searchInput);
+    vector<tuple<string, int>> foundMatches;
 
-    string searchFirstCode = get<0>(getMetephoneCode(searchInput));
-    string searchSecondCode = get<1>(getMetephoneCode(searchInput));
+    for (const Domain& domain : allDomains) {
+        vector<string> domainWords = tokenize(domain.name);
 
-    vector<string> output;
-    for (Domain domain : allDomains) { // To-Do: fix the loop
-        if ((domain.firstCode.size() > 0) && domain.firstCode == searchFirstCode) {
-            output.push_back(domain.name);
+        int matchCount = 0;
 
-        } else if ((domain.firstCode != "") && domain.firstCode == searchSecondCode) {
-            output.push_back(domain.name);
+        vector<tuple<string, string>> domainCodes;
+        for (const string& word : domainWords) {
+            domainCodes.push_back(getMetephoneCode(word));
         }
 
-        else if ((domain.secondCode.size() > 0 && domain.secondCode.size() > 0) && domain.secondCode == searchSecondCode) {
-            output.push_back(domain.name);
+        for (const string& searchWord : searchWords) {
+            auto searchCodes = getMetephoneCode(searchWord);
+
+            for (const auto& dCodes : domainCodes) {
+                if (
+                    get<0>(searchCodes) == get<0>(dCodes) ||
+                    get<0>(searchCodes) == get<1>(dCodes) ||
+                    get<1>(searchCodes) == get<0>(dCodes) ||
+                    get<1>(searchCodes) == get<1>(dCodes)
+                ) {
+                    matchCount++;
+                    break;
+                }
+            }
+        }
+
+        if (matchCount >= searchWords.size() / 2.0) {
+            foundMatches.emplace_back(domain.name, matchCount);
         }
     }
-    
+
+    sort(foundMatches.begin(), foundMatches.end(),
+        [](const auto& a, const auto& b) {
+            return get<1>(a) > get<1>(b);
+        });
+
+    vector<string> output;
+    output.reserve(foundMatches.size());
+
+    for (const auto& [str, num] : foundMatches) {
+        output.push_back(str);
+    }
+
     return output;
 }
 
@@ -125,24 +152,12 @@ vector<string> queryKnowledgeBaseByCategory(const string& searchInput) {
 
     vector<Domain> domainsByCategory = pullDomainsByCategory(processedSearchInput);
 
-    tuple<string, string> searchMetephoneCodes = getMetephoneCode(processedSearchInput);
-
-    string searchFirstCode = get<0>(getMetephoneCode(processedSearchInput));
-    string searchSecondCode = get<1>(getMetephoneCode(processedSearchInput));
+    
 
     vector<string> output;
     for (Domain domain : domainsByCategory) { // To-Do: fix the loop
-        if ((domain.firstCode.size() > 0) && domain.firstCode == searchFirstCode) {
-            output.push_back(domain.name);
-
-        } else if ((domain.firstCode != "") && domain.firstCode == searchSecondCode) {
-            output.push_back(domain.name);
-        }
-
-        else if ((domain.secondCode.size() > 0 && domain.secondCode.size() > 0) && domain.secondCode == searchSecondCode) {
-            output.push_back(domain.name);
-        }
+        output.push_back(domain.name);
     }
-    
+
     return output;
 }
