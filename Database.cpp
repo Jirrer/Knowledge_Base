@@ -3,18 +3,50 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include <cstdlib>
+#include <fstream>
 
 using namespace std;
 
+const char* getDbPath() {
+    const char* p = std::getenv("SQLITE_DB_PATH");
+    return (p && *p) ? p : nullptr;
+}
+
+bool openDatabase(sqlite3** db) { // To-Do: add loop that waits for user to acknowledge the error
+    const char* dbPath = getDbPath();
+
+    if (!dbPath) {
+        cerr << "Missing SQLITE_DB_PATH. Set it in your .env file.\n";
+        return false;
+    }
+
+    ifstream dbFile(dbPath);
+    if (!dbFile.good()) {
+        cerr << "Database file not found: " << dbPath << "\n";
+        return false;
+    }
+    dbFile.close();
+
+    int rc = sqlite3_open(dbPath, db);
+    if (rc != SQLITE_OK) {
+        cerr << "Can't open database: " << sqlite3_errmsg(*db) << endl;
+        sqlite3_close(*db);
+        *db = nullptr;
+        return false;
+    }
+
+    return true;
+}
+
 bool insertIntoKeys(const tuple<string, string, string>& payload) {
     sqlite3* db;
-    
-    int rc = sqlite3_open("Knowledge_Base.db", &db);
-    
-    if (rc) {
-            cerr << "Can't open database: " << sqlite3_errmsg(db) << endl;
-            return false;
-        } 
+
+    if (!openDatabase(&db)) {
+        return false;
+    }
+
+    int rc;
     
     sqlite3_stmt* stmt;
 
@@ -45,7 +77,9 @@ bool insertIntoKeys(const tuple<string, string, string>& payload) {
 
 vector<tuple<string, string>> pullDomainAndCategories() {
     sqlite3* db;
-    sqlite3_open("Knowledge_Base.db", &db);
+    if (!openDatabase(&db)) {
+        return {};
+    }
 
     const char* sql = "SELECT domain, category, content FROM keys;";
 
@@ -79,7 +113,7 @@ vector<tuple<string, string>> pullDomainAndCategoriesByCategory(string categoryI
 
     vector<tuple<string, string>> output;
 
-    if (sqlite3_open("Knowledge_Base.db", &db)) {
+    if (!openDatabase(&db)) {
         return output;
     }
 
@@ -116,8 +150,7 @@ string pullContentFromKeys(string domainKey) {
     sqlite3_stmt* stmt;
     string result = "";
 
-    if (sqlite3_open("Knowledge_Base.db", &db)) {
-        cerr << "Can't open database\n";
+    if (!openDatabase(&db)) {
         return "";
     }
 

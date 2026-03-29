@@ -1,8 +1,10 @@
 #include <iostream>
 #include <conio.h>
 #include <vector>
+#include <fstream>
 #include "query.h"
 #include "database.h"
+#include <cstdlib>
 
 using namespace std;
 
@@ -21,13 +23,14 @@ enum Direction_Choice {
 };
 
 // To-Do: add search algorithm
-// To-Do: change the name for 'add'
 // To-Do: make it so adding text (or editing in the future) acts a text editior
+// To-Do: add delete entry
 
 // Helper Methods
 void clearTerminal();
 User_Choice getChoice(string choiceInput);
 Direction_Choice getDirectionChoice();
+void loadDotEnv(const std::string& filename);
 
 // Methods After Main
 void searchKnowledgeBase(vector<string> searchResults);
@@ -82,9 +85,30 @@ Direction_Choice getDirectionChoice() {
     }
 }
 
+void loadDotEnv(const std::string& filename = ".env") {
+    ifstream file(filename);
+    string line;
+    while (getline(file, line)) {
+    if (line.empty() || line[0] == '#') continue;
+    auto eq = line.find('=');
+    if (eq == std::string::npos) continue;
+
+    string key = line.substr(0, eq);
+    string value = line.substr(eq + 1);
+
+    #ifdef _WIN32
+    _putenv_s(key.c_str(), value.c_str());
+    #else
+    setenv(key.c_str(), value.c_str(), 1);
+    #endif
+    }
+}
+
 int main() {
-    enum User_Choice choice;
+    enum User_Choice choice = search_base;
     string userInput;
+
+    loadDotEnv();
     
     while (choice != exit_program) {
         clearTerminal();
