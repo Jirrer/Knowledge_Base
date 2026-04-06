@@ -167,11 +167,11 @@ void searchKnowledgeBase(vector<string> searchResults) {
         if (keySelection == 0 || keySelection == 224) {
             int arrowDirection = _getch();
             
-            if (arrowDirection == 72 and lineIndex > 0) { 
+            if (arrowDirection == 72 && lineIndex > 0) { 
                 lineIndex--; 
                 cout << "\033[1A";
             }
-            else if (arrowDirection == 80 and lineIndex < searchResults.size() - 1) { 
+            else if (arrowDirection == 80 && lineIndex < searchResults.size() - 1) { 
                 lineIndex++; 
                 cout << "\033[1B";
             } 
