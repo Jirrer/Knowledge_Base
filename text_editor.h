@@ -1,13 +1,11 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <tuple>
 
-struct Letter {
-    int data;
-    Letter* next;
-
-    Letter(int val) : data(val), next(nullptr) {}
-};
-
-std::vector<std::string> openEditor();
-void printConsole(Letter* head);
+void openEditor();
+int readKeyPress();
+void processKeyPress(char keyPress);
+std::tuple<int,int> getTerminalSize_windows();
+void drawRows();
+void refreshScreen();
