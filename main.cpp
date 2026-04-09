@@ -2,12 +2,12 @@
 #include <conio.h>
 #include <vector>
 #include <fstream>
+#include <string>
+#include <tuple>
 #include "query.h"
 #include "database.h"
 #include <cstdlib>
 // #include "text_editor.h"
-
-using namespace std;
 
 enum User_Choice {
     exit_program,
@@ -23,31 +23,29 @@ enum Direction_Choice {
     leave,   
 };
 
-// To-Do: add search algorithm
-// To-Do: make it so adding text (or editing in the future) acts a text editior
 // To-Do: add delete entry
 // To-DO: normilize text before generating methephone codes
 
 // Helper Methods
 void clearTerminal();
-User_Choice getChoice(string choiceInput);
+User_Choice getChoice(std::string choiceInput);
 Direction_Choice getDirectionChoice();
 void loadDotEnv(const std::string& filename);
 
 // Methods After Main
-void searchKnowledgeBase(vector<string> searchResults);
-void showSelectedOutput(string domainName, vector<string> oldSearchResults);
+void searchKnowledgeBase(std::vector<std::string> searchResults);
+void showSelectedOutput(std::string domainName, std::vector<std::string> oldSearchResults);
 void addToKnowledgeBase();
-bool pushChanges(string name, string category, vector<string> text);
+bool pushChanges(std::string name, std::string category, std::vector<std::string> text);
 void printHelpLibrary();
 
 void clearTerminal() {
     // To-Do: accept linux as an option
 
-    system("cls");
+    std::system("cls");
 }
 
-User_Choice getChoice(string choiceInput) {
+User_Choice getChoice(std::string choiceInput) {
     if (choiceInput == "leave") {
         return User_Choice::exit_program;
     }
@@ -82,47 +80,47 @@ Direction_Choice getDirectionChoice() {
         }
 
         else if (input == 3) { // ctrl+c
-            exit(0); // To-Do: maybe clear terminal here
+            std::exit(0); // To-Do: maybe clear terminal here
         }
     }
 }
 
 void loadDotEnv(const std::string& filename = ".env") {
-    ifstream file(filename);
-    string line;
-    while (getline(file, line)) {
-    if (line.empty() || line[0] == '#') continue;
-    auto eq = line.find('=');
-    if (eq == std::string::npos) continue;
+    std::ifstream file(filename);
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.empty() || line[0] == '#') continue;
+        auto eq = line.find('=');
+        if (eq == std::string::npos) continue;
 
-    string key = line.substr(0, eq);
-    string value = line.substr(eq + 1);
+        std::string key = line.substr(0, eq);
+        std::string value = line.substr(eq + 1);
 
-    #ifdef _WIN32
-    _putenv_s(key.c_str(), value.c_str());
-    #else
-    setenv(key.c_str(), value.c_str(), 1);
-    #endif
+        #ifdef _WIN32
+        _putenv_s(key.c_str(), value.c_str());
+        #else
+        setenv(key.c_str(), value.c_str(), 1);
+        #endif
     }
 }
 
 int main() {
     enum User_Choice choice = search_base;
-    string userInput;
+    std::string userInput;
 
     loadDotEnv();
     
     while (choice != exit_program) {
         clearTerminal();
         
-        cout << " *** Search *** " << endl << ": ";
+        std::cout << " *** Search *** " << std::endl << ": ";
 
-        getline(cin, userInput);
+        std::getline(std::cin, userInput);
 
         choice = getChoice(userInput);
 
         switch (choice) {
-            case exit_program: exit(1); break;
+            case exit_program: std::exit(1); break;
             case add: addToKnowledgeBase(); break;
             case search_by_category: searchKnowledgeBase(queryKnowledgeBaseByCategory(userInput)); break;
             case help: printHelpLibrary(); break;
@@ -133,15 +131,15 @@ int main() {
     return 0;
 }
 
-void searchKnowledgeBase(vector<string> searchResults) {
+void searchKnowledgeBase(std::vector<std::string> searchResults) {
     clearTerminal();
 
-    cout << "*** Search Results ***" << endl;
+    std::cout << "*** Search Results ***" << std::endl;
 
     if (searchResults.size() == 0) {
-        cout << "No Results Found" << endl;
+        std::cout << "No Results Found" << std::endl;
 
-        cout << "<-- Return";
+        std::cout << "<-- Return";
 
         Direction_Choice choice = getDirectionChoice();
 
@@ -150,18 +148,18 @@ void searchKnowledgeBase(vector<string> searchResults) {
         }
     }
 
-    for (string result : searchResults) {
-        cout << result << endl;
+    for (std::string result : searchResults) {
+        std::cout << result << std::endl;
     }
 
-    cout << "\033[2;1H" << "\033[" << searchResults[0].size() << "C";
+    std::cout << "\033[2;1H" << "\033[" << searchResults[0].size() << "C";
 
     int lineIndex = 0;
     while (true) {
         int keySelection = _getch();
         
         if (keySelection == 27) { return; } // esc
-        if (keySelection == 3) { clearTerminal(); exit(0); } // ctrl+c
+        if (keySelection == 3) { clearTerminal(); std::exit(0); } // ctrl+c
         if (keySelection == 13) { break; } // enter
         
         if (keySelection == 0 || keySelection == 224) {
@@ -169,15 +167,15 @@ void searchKnowledgeBase(vector<string> searchResults) {
             
             if (arrowDirection == 72 && lineIndex > 0) { 
                 lineIndex--; 
-                cout << "\033[1A";
+                std::cout << "\033[1A";
             }
             else if (arrowDirection == 80 && lineIndex < searchResults.size() - 1) { 
                 lineIndex++; 
-                cout << "\033[1B";
+                std::cout << "\033[1B";
             } 
             
-            cout << "\r";
-            cout << "\033[" << searchResults[lineIndex].size() << "C";
+            std::cout << "\r";
+            std::cout << "\033[" << searchResults[lineIndex].size() << "C";
         }
     }
 
@@ -186,14 +184,14 @@ void searchKnowledgeBase(vector<string> searchResults) {
 
 }
 
-void showSelectedOutput(string domainName, vector<string> oldSearchResults) {
+void showSelectedOutput(std::string domainName, std::vector<std::string> oldSearchResults) {
     clearTerminal();
 
-    cout << domainName << endl << endl;
+    std::cout << domainName << std::endl << std::endl;
 
-    cout << pullContentFromKeys(domainName) << endl << endl;
+    std::cout << pullContentFromKeys(domainName) << std::endl << std::endl;
 
-    cout << "-- New Search --";
+    std::cout << "-- New Search --";
 
     Direction_Choice choice = getDirectionChoice();
 
@@ -202,25 +200,25 @@ void showSelectedOutput(string domainName, vector<string> oldSearchResults) {
 }
 
 void addToKnowledgeBase() {
-    string name;
-    string category;
-    vector<string> text;
+    std::string name;
+    std::string category;
+    std::vector<std::string> text;
 
-    cout << "Enter Name: ";
-    getline(cin, name);
+    std::cout << "Enter Name: ";
+    std::getline(std::cin, name);
 
-    cout << "Enter Category: ";
-    getline(cin, category);
+    std::cout << "Enter Category: ";
+    std::getline(std::cin, category);
 
-    cout << "Enter Text content (enter '.' to end) -->" << endl;
+    std::cout << "Enter Text content (enter '.' to end) -->" << std::endl;
     
-    string line;
-    while (getline(cin, line) && line != ".") {
+    std::string line;
+    while (std::getline(std::cin, line) && line != ".") {
         text.push_back(line);
     }
  
-    if (pushChanges(name, category, text)) { cout << "Successfully Added" << endl; }
-    else { cout << "Error Trying to Add" << endl; }
+    if (pushChanges(name, category, text)) { std::cout << "Successfully Added" << std::endl; }
+    else { std::cout << "Error Trying to Add" << std::endl; }
 
 
     if (getDirectionChoice()) {
@@ -228,10 +226,10 @@ void addToKnowledgeBase() {
     }
 }
 
-bool pushChanges(string name, string category, vector<string> text) {
+bool pushChanges(std::string name, std::string category, std::vector<std::string> text) {
     if (name.empty()) { return false; }
 
-    string content;
+    std::string content;
 
     if (text.empty()) {
         content = "No Content to Show";
@@ -242,7 +240,7 @@ bool pushChanges(string name, string category, vector<string> text) {
         }
     }
 
-    tuple<string, string, string> payload(name, category, content);
+    std::tuple<std::string, std::string, std::string> payload(name, category, content);
 
     return insertIntoKeys(payload);
 }
@@ -250,12 +248,12 @@ bool pushChanges(string name, string category, vector<string> text) {
 void printHelpLibrary() { // To-Do: add a specific help (like help python)
     clearTerminal(); 
 
-    cout << "*** Help Library ***" << endl << endl;
-    cout << "(?) - Show Help Library" << endl;
-    cout << "(Example Search) - Search Knowledge Base" << endl;
-    cout << "(__exampleCategory) - Search by category" << endl;
-    cout << "(crtl+c) - End Program" << endl;
-    cout << "(add) - Add New Entry" << endl;
+    std::cout << "*** Help Library ***" << std::endl << std::endl;
+    std::cout << "(?) - Show Help Library" << std::endl;
+    std::cout << "(Example Search) - Search Knowledge Base" << std::endl;
+    std::cout << "(__exampleCategory) - Search by category" << std::endl;
+    std::cout << "(crtl+c) - End Program" << std::endl;
+    std::cout << "(add) - Add New Entry" << std::endl;
 
     if (getDirectionChoice()) {
         return;

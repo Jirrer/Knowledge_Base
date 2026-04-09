@@ -8,36 +8,31 @@
 #include "double_metaphone.h"
 #include <sstream>
 
-using namespace std;
-
 struct Domain {
-    string name;
-    string category;
-    string firstCode;
-    string secondCode;
-    string content;
+    std::string name;
+    std::string category;
+    std::string firstCode;
+    std::string secondCode;
+    std::string content;
 };
 
-// Helper Methods
-tuple<string, string> getMetephoneCode(const string& text);
+std::tuple<std::string, std::string> getMetephoneCode(const std::string& text);
+std::vector<std::string> tokenize(const std::string& text);
+std::vector<Domain> getAllDomains();
+std::vector<Domain> getDomainsByCategory(std::string category);
 
-// Private Methods
-vector<Domain> pullAllDomains();
-vector<Domain> pullDomainsByCategory(string category);
-vector<string> tokenize(const string& text);
-
-tuple<string, string> getMetephoneCode(const string& text) {
-    vector<string> codes;
+std::tuple<std::string, std::string> getMetephoneCode(const std::string& text) {
+    std::vector<std::string> codes;
 
     DoubleMetaphone(text, &codes);
 
-    return make_tuple(codes[0], codes[1]);
+    return std::make_tuple(codes[0], codes[1]);
 }
 
-vector<string> tokenize(const string& text) {
-    vector<string> tokens;
-    stringstream ss(text);
-    string word;
+std::vector<std::string> tokenize(const std::string& text) {
+    std::vector<std::string> tokens;
+    std::stringstream ss(text);
+    std::string word;
 
     while (ss >> word) {
         tokens.push_back(word);
@@ -46,22 +41,21 @@ vector<string> tokenize(const string& text) {
     return tokens;
 }
 
+std::vector<Domain> getAllDomains() {
+    std::vector<std::tuple<std::string, std::string>> domainAndCategories = pullDomainAndCategories();
 
-vector<Domain> pullAllDomains() { // To-Do: refactor domain struct and this method
-    vector<tuple<string, string>> domainAndCategories = pullDomainAndCategories();
+    std::vector<Domain> output;
 
-    vector<Domain> output;
-
-    for (tuple<string, string> domainAndCategory : domainAndCategories) {
+    for (std::tuple<std::string, std::string> domainAndCategory : domainAndCategories) {
         Domain procressedDomain;
 
-        procressedDomain.name = get<0>(domainAndCategory);
+        procressedDomain.name = std::get<0>(domainAndCategory);
 
-        tuple<string, string> metephoneCodesPair = getMetephoneCode(procressedDomain.name);
+        std::tuple<std::string, std::string> metephoneCodesPair = getMetephoneCode(procressedDomain.name);
         
-        procressedDomain.category = get<1>(domainAndCategory);
-        procressedDomain.firstCode = get<0>(metephoneCodesPair);
-        procressedDomain.secondCode= get<1>(metephoneCodesPair);
+        procressedDomain.category = std::get<1>(domainAndCategory);
+        procressedDomain.firstCode = std::get<0>(metephoneCodesPair);
+        procressedDomain.secondCode= std::get<1>(metephoneCodesPair);
 
         output.push_back(procressedDomain);
     }
@@ -70,20 +64,20 @@ vector<Domain> pullAllDomains() { // To-Do: refactor domain struct and this meth
     
 }
 
-vector<Domain> pullDomainsByCategory(string category) { // To-Do: refactor domain struct and this method
-    vector<tuple<string, string>> domainAndCategories = pullDomainAndCategoriesByCategory(category);
+std::vector<Domain> getDomainsByCategory(std::string category) { // To-Do: refactor domain struct and this method
+    std::vector<std::tuple<std::string, std::string>> domainAndCategories = pullDomainAndCategoriesByCategory(category);
 
-    vector<Domain> output;
+    std::vector<Domain> output;
 
-    for (tuple<string, string> domainAndCategory : domainAndCategories) {
+    for (std::tuple<std::string, std::string> domainAndCategory : domainAndCategories) {
         Domain procressedDomain;
 
-        tuple<string, string> metephoneCodesPair = getMetephoneCode("test");
+        std::tuple<std::string, std::string> metephoneCodesPair = getMetephoneCode("test");
         
-        procressedDomain.name = get<0>(domainAndCategory);
-        procressedDomain.category = get<1>(domainAndCategory);
-        procressedDomain.firstCode = get<0>(metephoneCodesPair);
-        procressedDomain.secondCode= get<1>(metephoneCodesPair);
+        procressedDomain.name = std::get<0>(domainAndCategory);
+        procressedDomain.category = std::get<1>(domainAndCategory);
+        procressedDomain.firstCode = std::get<0>(metephoneCodesPair);
+        procressedDomain.secondCode= std::get<1>(metephoneCodesPair);
 
         output.push_back(procressedDomain);
     }
@@ -92,31 +86,31 @@ vector<Domain> pullDomainsByCategory(string category) { // To-Do: refactor domai
     
 }
 
-vector<string> queryKnowledgeBase(const string& searchInput) {
-    vector<Domain> allDomains = pullAllDomains();
-    vector<string> searchWords = tokenize(searchInput);
+std::vector<std::string> queryKnowledgeBase(const std::string& searchInput) {
+    std::vector<Domain> allDomains = getAllDomains();
+    std::vector<std::string> searchWords = tokenize(searchInput);
 
-    vector<tuple<string, int>> foundMatches;
+    std::vector<std::tuple<std::string, int>> foundMatches;
 
     for (const Domain& domain : allDomains) {
-        vector<string> domainWords = tokenize(domain.name);
+        std::vector<std::string> domainWords = tokenize(domain.name);
 
         int matchCount = 0;
 
-        vector<tuple<string, string>> domainCodes;
-        for (const string& word : domainWords) {
+        std::vector<std::tuple<std::string, std::string>> domainCodes;
+        for (const std::string& word : domainWords) {
             domainCodes.push_back(getMetephoneCode(word));
         }
 
-        for (const string& searchWord : searchWords) {
+        for (const std::string& searchWord : searchWords) {
             auto searchCodes = getMetephoneCode(searchWord);
 
             for (const auto& dCodes : domainCodes) {
                 if (
-                    get<0>(searchCodes) == get<0>(dCodes) ||
-                    get<0>(searchCodes) == get<1>(dCodes) ||
-                    get<1>(searchCodes) == get<0>(dCodes) ||
-                    get<1>(searchCodes) == get<1>(dCodes)
+                    std::get<0>(searchCodes) == std::get<0>(dCodes) ||
+                    std::get<0>(searchCodes) == std::get<1>(dCodes) ||
+                    std::get<1>(searchCodes) == std::get<0>(dCodes) ||
+                    std::get<1>(searchCodes) == std::get<1>(dCodes)
                 ) {
                     matchCount++;
                     break;
@@ -129,12 +123,12 @@ vector<string> queryKnowledgeBase(const string& searchInput) {
         }
     }
 
-    sort(foundMatches.begin(), foundMatches.end(),
+    std::sort(foundMatches.begin(), foundMatches.end(),
         [](const auto& a, const auto& b) {
-            return get<1>(a) > get<1>(b);
+            return std::get<1>(a) > std::get<1>(b);
         });
 
-    vector<string> output;
+    std::vector<std::string> output;
     output.reserve(foundMatches.size());
 
     for (const auto& [str, num] : foundMatches) {
@@ -144,14 +138,13 @@ vector<string> queryKnowledgeBase(const string& searchInput) {
     return output;
 }
 
-vector<string> queryKnowledgeBaseByCategory(const string& searchInput) {
-    string processedSearchInput = searchInput.substr(2); 
+std::vector<std::string> queryKnowledgeBaseByCategory(const std::string& searchInput) {
+    std::string processedSearchInput = searchInput.substr(2); 
 
-    vector<Domain> domainsByCategory = pullDomainsByCategory(processedSearchInput);
+    std::vector<Domain> domainsByCategory = getDomainsByCategory(processedSearchInput);
 
-    
 
-    vector<string> output;
+    std::vector<std::string> output;
     for (Domain domain : domainsByCategory) { // To-Do: fix the loop
         output.push_back(domain.name);
     }

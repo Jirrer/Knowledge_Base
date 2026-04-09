@@ -1,10 +1,6 @@
 #pragma once
-#include <string>
-#include <vector>
 
-using namespace std;
-
-bool insertIntoKeys(const tuple<string, string, string>& payload);
-vector<tuple<string, string>> pullDomainAndCategories();
-vector<tuple<string, string>> pullDomainAndCategoriesByCategory(string category);
-string pullContentFromKeys(string domainKey);
+bool insertIntoKeys(const std::tuple<std::string, std::string, std::string>& payload);
+std::vector<std::tuple<std::string, std::string>> pullDomainAndCategories();
+std::vector<std::tuple<std::string, std::string>> pullDomainAndCategoriesByCategory(std::string category);
+std::string pullContentFromKeys(std::string domainKey);

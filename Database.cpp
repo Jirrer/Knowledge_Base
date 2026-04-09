@@ -6,8 +6,6 @@
 #include <cstdlib>
 #include <fstream>
 
-using namespace std;
-
 const char* getDbPath() {
     const char* p = std::getenv("SQLITE_DB_PATH");
     return (p && *p) ? p : nullptr;
@@ -17,20 +15,20 @@ bool openDatabase(sqlite3** db) { // To-Do: add loop that waits for user to ackn
     const char* dbPath = getDbPath();
 
     if (!dbPath) {
-        cerr << "Missing SQLITE_DB_PATH. Set it in your .env file.\n";
+        std::cerr << "Missing SQLITE_DB_PATH. Set it in your .env file.\n";
         return false;
     }
 
-    ifstream dbFile(dbPath);
+    std::ifstream dbFile(dbPath);
     if (!dbFile.good()) {
-        cerr << "Database file not found: " << dbPath << "\n";
+        std::cerr << "Database file not found: " << dbPath << "\n";
         return false;
     }
     dbFile.close();
 
     int rc = sqlite3_open(dbPath, db);
     if (rc != SQLITE_OK) {
-        cerr << "Can't open database: " << sqlite3_errmsg(*db) << endl;
+        std::cerr << "Can't open database: " << sqlite3_errmsg(*db) << std::endl;
         sqlite3_close(*db);
         *db = nullptr;
         return false;
@@ -39,7 +37,7 @@ bool openDatabase(sqlite3** db) { // To-Do: add loop that waits for user to ackn
     return true;
 }
 
-bool insertIntoKeys(const tuple<string, string, string>& payload) {
+bool insertIntoKeys(const std::tuple<std::string, std::string, std::string>& payload) {
     sqlite3* db;
 
     if (!openDatabase(&db)) {
@@ -55,18 +53,18 @@ bool insertIntoKeys(const tuple<string, string, string>& payload) {
 
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            cerr << "Prepare failed: " << sqlite3_errmsg(db) << endl;
+            std::cerr << "Prepare failed: " << sqlite3_errmsg(db) << std::endl;
             sqlite3_close(db);
             return false;
         }
 
-    sqlite3_bind_text(stmt, 1, get<0>(payload).c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 2, get<1>(payload).c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 3, get<2>(payload).c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 1, std::get<0>(payload).c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, std::get<1>(payload).c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, std::get<2>(payload).c_str(), -1, SQLITE_TRANSIENT);
 
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        cerr << "Insert into keys failed: " << sqlite3_errmsg(db) << endl;
+        std::cerr << "Insert into keys failed: " << sqlite3_errmsg(db) << std::endl;
     }
 
     sqlite3_finalize(stmt);
@@ -75,7 +73,7 @@ bool insertIntoKeys(const tuple<string, string, string>& payload) {
     return rc == SQLITE_DONE;
 }
 
-vector<tuple<string, string>> pullDomainAndCategories() {
+std::vector<std::tuple<std::string, std::string>> pullDomainAndCategories() {
     sqlite3* db;
     if (!openDatabase(&db)) {
         return {};
@@ -87,14 +85,14 @@ vector<tuple<string, string>> pullDomainAndCategories() {
 
     sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
 
-    vector<tuple<string, string>> output;
+    std::vector<std::tuple<std::string, std::string>> output;
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        string domain = sqlite3_column_text(stmt, 0)
+        std::string domain = sqlite3_column_text(stmt, 0)
         ? (const char*)sqlite3_column_text(stmt, 0)
         : "";
 
-        string category = sqlite3_column_text(stmt, 1)
+        std::string category = sqlite3_column_text(stmt, 1)
         ? (const char*)sqlite3_column_text(stmt, 1)
         : "";
 
@@ -107,11 +105,11 @@ vector<tuple<string, string>> pullDomainAndCategories() {
     return output;
 }
 
-vector<tuple<string, string>> pullDomainAndCategoriesByCategory(string categoryInput) {
+std::vector<std::tuple<std::string, std::string>> pullDomainAndCategoriesByCategory(std::string categoryInput) {
     sqlite3* db;
     sqlite3_stmt* stmt;
 
-    vector<tuple<string, string>> output;
+    std::vector<std::tuple<std::string, std::string>> output;
 
     if (!openDatabase(&db)) {
         return output;
@@ -128,11 +126,11 @@ vector<tuple<string, string>> pullDomainAndCategoriesByCategory(string categoryI
     sqlite3_bind_text(stmt, 1, categoryInput.c_str(), -1, SQLITE_TRANSIENT);
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        string domain = sqlite3_column_text(stmt, 0)
+        std::string domain = sqlite3_column_text(stmt, 0)
             ? (const char*)sqlite3_column_text(stmt, 0)
             : "";
 
-        string category = sqlite3_column_text(stmt, 1)
+        std::string category = sqlite3_column_text(stmt, 1)
             ? (const char*)sqlite3_column_text(stmt, 1)
             : "";
 
@@ -145,10 +143,10 @@ vector<tuple<string, string>> pullDomainAndCategoriesByCategory(string categoryI
     return output;
 }
 
-string pullContentFromKeys(string domainKey) {
+std::string pullContentFromKeys(std::string domainKey) {
     sqlite3* db;
     sqlite3_stmt* stmt;
-    string result = "";
+    std::string result = "";
 
     if (!openDatabase(&db)) {
         return "";
@@ -157,7 +155,7 @@ string pullContentFromKeys(string domainKey) {
     const char* sql = "SELECT content FROM keys WHERE domain = ?;";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
-        cerr << "Prepare failed\n";
+        std::cerr << "Prepare failed\n";
         sqlite3_close(db);
         return "";
     }

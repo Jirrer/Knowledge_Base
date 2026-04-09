@@ -9,6 +9,9 @@
 #include <assert.h>
 #include "double_metaphone.h"
 
+using std::string;
+using std::vector;
+
 const unsigned int max_length = 32;
 
 void MakeUpper(string &s) {
@@ -164,7 +167,7 @@ void DoubleMetaphone(const string &str, vector<string> *codes)
         current += 1;
       break;
 
-    case 'Ç':
+    case '\xC7':
       primary += "S";
       secondary += "S";
       current += 1;
@@ -628,7 +631,7 @@ void DoubleMetaphone(const string &str, vector<string> *codes)
       secondary += "N";
       break;
 
-    case 'Ñ':
+    case '\xD1':
       current += 1;
       primary += "N";
       secondary += "N";
