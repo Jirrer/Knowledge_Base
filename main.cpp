@@ -5,7 +5,7 @@
 #include "query.h"
 #include "database.h"
 #include <cstdlib>
-#include "text_editor.h"
+// #include "text_editor.h"
 
 using namespace std;
 
