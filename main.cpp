@@ -5,6 +5,7 @@
 #include "query.h"
 #include "database.h"
 #include <cstdlib>
+// #include "text_editor.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ enum Direction_Choice {
 // To-Do: add search algorithm
 // To-Do: make it so adding text (or editing in the future) acts a text editior
 // To-Do: add delete entry
+// To-DO: normilize text before generating methephone codes
 
 // Helper Methods
 void clearTerminal();
@@ -165,11 +167,11 @@ void searchKnowledgeBase(vector<string> searchResults) {
         if (keySelection == 0 || keySelection == 224) {
             int arrowDirection = _getch();
             
-            if (arrowDirection == 72 and lineIndex > 0) { 
+            if (arrowDirection == 72 && lineIndex > 0) { 
                 lineIndex--; 
                 cout << "\033[1A";
             }
-            else if (arrowDirection == 80 and lineIndex < searchResults.size() - 1) { 
+            else if (arrowDirection == 80 && lineIndex < searchResults.size() - 1) { 
                 lineIndex++; 
                 cout << "\033[1B";
             } 

@@ -26,9 +26,6 @@ vector<Domain> pullAllDomains();
 vector<Domain> pullDomainsByCategory(string category);
 vector<string> tokenize(const string& text);
 
-// To-Do: a lot of refactoring and abstracting
-
-
 tuple<string, string> getMetephoneCode(const string& text) {
     vector<string> codes;
 

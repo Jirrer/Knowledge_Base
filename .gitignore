@@ -4,3 +4,4 @@ sqlite3.h
 sqlite3.o
 *.lnk
 *.env
+*.zip
