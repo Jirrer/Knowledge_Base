@@ -15,6 +15,7 @@ enum User_Choice {
     add,
     search_by_category,
     help,
+    del,
 };
 
 enum Direction_Choice {
@@ -26,18 +27,17 @@ enum Direction_Choice {
 // To-Do: add delete entry
 // To-DO: normilize text before generating methephone codes
 
-// Helper Methods
 void clearTerminal();
 User_Choice getChoice(std::string choiceInput);
 Direction_Choice getDirectionChoice();
 void loadDotEnv(const std::string& filename);
-
-// Methods After Main
 void searchKnowledgeBase(std::vector<std::string> searchResults);
 void showSelectedOutput(std::string domainName, std::vector<std::string> oldSearchResults);
 void addToKnowledgeBase();
 bool pushChanges(std::string name, std::string category, std::vector<std::string> text);
 void printHelpLibrary();
+void removeFromKnowledgeBase();
+bool checkValidTitleAndCategory(std::string title, std::string category);
 
 void clearTerminal() {
     // To-Do: accept linux as an option
@@ -53,6 +53,10 @@ User_Choice getChoice(std::string choiceInput) {
     else if (choiceInput == "add") {
         return User_Choice::add;
     } 
+
+    else if (choiceInput == "del") {
+        return User_Choice::del;
+    }
 
     else if (choiceInput[0] == '_' && choiceInput[1] == '_') {
         return User_Choice::search_by_category;
@@ -125,13 +129,14 @@ int main() {
             case search_by_category: searchKnowledgeBase(queryKnowledgeBaseByCategory(userInput)); break;
             case help: printHelpLibrary(); break;
             case search_base: searchKnowledgeBase(queryKnowledgeBase(userInput)); break;
+            case del: removeFromKnowledgeBase(); break; 
         }
     }
 
     return 0;
 }
 
-void searchKnowledgeBase(std::vector<std::string> searchResults) {
+void searchKnowledgeBase(std::vector<std::string> searchResults) { // To-Do: have it print the category as - title (category)
     clearTerminal();
 
     std::cout << "*** Search Results ***" << std::endl;
@@ -204,7 +209,7 @@ void addToKnowledgeBase() {
     std::string category;
     std::vector<std::string> text;
 
-    std::cout << "Enter Name: ";
+    std::cout << "Enter Title: ";
     std::getline(std::cin, name);
 
     std::cout << "Enter Category: ";
@@ -221,9 +226,7 @@ void addToKnowledgeBase() {
     else { std::cout << "Error Trying to Add" << std::endl; }
 
 
-    if (getDirectionChoice()) {
-        return;
-    }
+    if (getDirectionChoice()) { return; }
 }
 
 bool pushChanges(std::string name, std::string category, std::vector<std::string> text) {
@@ -243,6 +246,36 @@ bool pushChanges(std::string name, std::string category, std::vector<std::string
     std::tuple<std::string, std::string, std::string> payload(name, category, content);
 
     return insertIntoKeys(payload);
+}
+
+void removeFromKnowledgeBase() {
+    clearTerminal();
+
+    std::string title;
+    std::string category;
+
+    std::cout << "Enter Title: ";
+    std::getline(std::cin, title);
+
+    std::cout << "Verify Category: ";
+    std::getline(std::cin, category);
+
+    if (checkValidTitleAndCategory(title, category) == false) {
+        std::cout << "Category does not match Title";
+        return;
+    }
+
+    if (removeFromDatabase(title, category)) { std::cout << "Sucessfully removed " << title << " (" << category << ")"; }
+    else {std::cout << "Error removing " << title << " (" << category << ")"; }
+
+    if (getDirectionChoice()) { return; }
+}
+
+
+bool checkValidTitleAndCategory(std::string title, std::string category) {
+
+
+    return true;
 }
 
 void printHelpLibrary() { // To-Do: add a specific help (like help python)

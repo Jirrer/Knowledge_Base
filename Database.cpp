@@ -179,3 +179,8 @@ std::string pullContentFromKeys(std::string domainKey) {
 
     return result;
 }
+
+bool removeFromDatabase(std::string title, std::string category) {
+
+    return true;
+}
