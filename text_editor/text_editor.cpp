@@ -6,49 +6,38 @@
 #include "text_editor.h"
 
 struct Letter {
-    int index;
     char value;
+    Letter* prev;
+    Letter* next;
+
+    Letter(char val, Letter* previous) : value(val), prev(previous), next(nullptr) {}
 };
 
 std::vector<Letter> content;
 int currIndex = 0;
 
+Letter firstLetter('~', nullptr);
+
 void openEditor() {
-    drawRows();
+    int charInput;
+    Letter* lastLetter = &firstLetter;
 
-    int c;
+    printToScreen();
 
-    while ((c = readKeyPress()) >= 0) {
-        if (c == 0) { continue; }
+    while ((charInput = readKeyPress()) >= 0) {
+        processKeyPress(charInput);
 
-        if (c == 8) {
-            if (currIndex > 0) {
-                content.erase(content.begin() + (currIndex - 1));
-                currIndex--;
-                drawRows();
-            }
-            continue;
-        }
+        Letter* newLetter = new Letter(charInput, lastLetter);
+        
+        lastLetter -> next = newLetter;
+        lastLetter = newLetter;
 
-        if (c == 9) {
-            for (int x = 0; x < 5; x++) {
-                Letter l;
-                l.index = currIndex;
-                l.value = ' ';
-
-                content.push_back(l);
-                currIndex++;
-            }
-
-            continue;
-        }
-
-        processKeyPress(c);
+        printToScreen();
     }
 }
 
-int readKeyPress() {
-    int keyPress = _getch();
+char readKeyPress() {
+    char keyPress = _getch();
 
     switch (keyPress) {
         case 3: 
@@ -69,66 +58,37 @@ int readKeyPress() {
 }
 
 void processKeyPress(char keyPress) {
-    Letter letter;
-    letter.value = keyPress;
-    letter.index = currIndex + 1;
-
-    content.insert(content.begin() + currIndex, letter);
-    currIndex++;
-
-    drawRows();
+    
 
 }
 
-std::tuple<int,int> getTerminalSize_windows() { // fix swappend x and y
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+// std::tuple<int,int> getTerminalSize_windows() { // fix swappend x and y
+//     CONSOLE_SCREEN_BUFFER_INFO csbi;
 
-    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)) {
-        int columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-        int rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+//     if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)) {
+//         int columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+//         int rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
         
-        return std::make_tuple(rows, columns);
-    }
+//         return std::make_tuple(rows, columns);
+//     }
 
-    return std::make_tuple(-1, -1);
-}
+//     return std::make_tuple(-1, -1);
+// }
 
-void refreshScreen_windows() {
+void refreshScreen() {
     system("cls");
 }
 
-void drawRows() {
-    refreshScreen_windows();
-    std::cout << "~ ";
+void printToScreen() {
+    refreshScreen();
 
-    std::tuple<int, int> screenSize = getTerminalSize_windows();
-    int screenLength = std::get<0>(screenSize);
-    int screenHeight = std::get<1>(screenSize);
+    Letter* l = &firstLetter;
+    
+    while (l -> next) {
+        std::cout << l->value;
 
-    int printedRows = 0;
-    int lineIndex = 0;
-    size_t contentIndex = 0;
-    while (printedRows < screenHeight){
-        if (lineIndex == screenLength - 5) { 
-            std::cout << "\n~ "; 
-            printedRows++;
-            lineIndex = 0;
-        }
-
-        lineIndex++;
-        
-        if (contentIndex < content.size()) {
-            if (content[contentIndex].value == 10) {
-                printedRows++;
-                lineIndex = 0;
-            } else {
-                std::cout << content[contentIndex].value;
-            }
-
-        }
-
-        contentIndex++;
-
-
+        l = l -> next;  
     }
+
+    std::cout << l->value;
 }

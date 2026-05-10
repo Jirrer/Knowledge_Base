@@ -4,8 +4,7 @@
 #include <tuple>
 
 void openEditor();
-int readKeyPress();
+char readKeyPress();
 void processKeyPress(char keyPress);
 std::tuple<int,int> getTerminalSize_windows();
-void drawRows();
-void refreshScreen();
+void printToScreen();
