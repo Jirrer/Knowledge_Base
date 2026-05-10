@@ -9,8 +9,9 @@ struct Letter {
     char value;
     Letter* prev;
     Letter* next;
+    bool deleted;
 
-    Letter(char val, Letter* previous) : value(val), prev(previous), next(nullptr) {}
+    Letter(char val, Letter* previous) : value(val), prev(previous), next(nullptr), deleted(false) {}
 };
 
 std::vector<Letter> content;
@@ -25,12 +26,17 @@ void openEditor() {
     printToScreen();
 
     while ((charInput = readKeyPress()) >= 0) {
-        processKeyPress(charInput);
-
-        Letter* newLetter = new Letter(charInput, lastLetter);
-        
-        lastLetter -> next = newLetter;
-        lastLetter = newLetter;
+        if (charInput == 8) { // Delete
+            if (!lastLetter->prev) { continue;}
+            
+            lastLetter->deleted = true; 
+            lastLetter = lastLetter->prev;  
+        } else {
+            Letter* newLetter = new Letter(charInput, lastLetter);
+            
+            lastLetter -> next = newLetter;
+            lastLetter = newLetter;
+        }
 
         printToScreen();
     }
@@ -57,11 +63,6 @@ char readKeyPress() {
     return keyPress;
 }
 
-void processKeyPress(char keyPress) {
-    
-
-}
-
 // std::tuple<int,int> getTerminalSize_windows() { // fix swappend x and y
 //     CONSOLE_SCREEN_BUFFER_INFO csbi;
 
@@ -80,15 +81,16 @@ void refreshScreen() {
 }
 
 void printToScreen() {
-    refreshScreen();
+    // refreshScreen();
+    std::cout << std::endl;
 
     Letter* l = &firstLetter;
     
     while (l -> next) {
-        std::cout << l->value;
-
+        if (!l->deleted) { std::cout << l->value; }
+        
         l = l -> next;  
     }
 
-    std::cout << l->value;
+    if (!l->deleted) { std::cout << l->value; }
 }
