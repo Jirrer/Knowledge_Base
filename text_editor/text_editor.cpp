@@ -14,83 +14,98 @@ struct Letter {
     Letter(char val, Letter* previous) : value(val), prev(previous), next(nullptr), deleted(false) {}
 };
 
+// To-Do: deleting a letter keeps it in the struct the cursorLocation is buggy
+
 std::vector<Letter> content;
 int currIndex = 0;
 
 Letter firstLetter('~', nullptr);
+Letter* cursorLocation = &firstLetter;
 
 void openEditor() {
     int charInput;
-    Letter* lastLetter = &firstLetter;
 
     printToScreen();
 
-    while ((charInput = readKeyPress()) >= 0) {
-        if (charInput == 8) { // Delete
-            if (!lastLetter->prev) { continue;}
-            
-            lastLetter->deleted = true; 
-            lastLetter = lastLetter->prev;  
-        } else {
-            Letter* newLetter = new Letter(charInput, lastLetter);
-            
-            lastLetter -> next = newLetter;
-            lastLetter = newLetter;
+    while ((charInput = _getch()) != 3) {
+        if (charInput == 224 || charInput == 0) {  // Escape sequence
+            charInput = _getch();  // Get the actual arrow key code
         }
+        
+        switch (charInput) {
+            case 8: // Backspace
+                if (!cursorLocation->prev) { continue;}
+                
+                cursorLocation->deleted = true; 
+                cursorLocation = cursorLocation->prev; 
+                
+                break;
 
+            case 72: // Up Arrow
+                
+
+                break;
+
+            case 80: // Down Arrow
+
+
+                break;
+            
+            case 75: // Left Arrow
+                if (cursorLocation->prev && !cursorLocation->prev->deleted) {
+                    cursorLocation = cursorLocation->prev;
+                }
+
+                break;
+
+
+            case 77: // Right Arrow
+                if (cursorLocation->next && !cursorLocation->prev->deleted) {
+                    cursorLocation = cursorLocation->next;
+                }
+
+                break;
+        
+            default:
+                Letter* newLetter = new Letter(charInput, cursorLocation);
+
+                newLetter->next = cursorLocation->next;
+                        
+                cursorLocation -> next = newLetter;
+                cursorLocation = newLetter;
+
+                break;
+        }
+        
         printToScreen();
     }
 }
 
-char readKeyPress() {
-    char keyPress = _getch();
-
-    switch (keyPress) {
-        case 3: 
-            return -1; // Ctrl+C
-
-        case 8: // Backspace
-            return 8;
-
-        case 10:
-            return 10;
-
-        case 13:
-            return 10;
-
-    }
-
-    return keyPress;
-}
-
-// std::tuple<int,int> getTerminalSize_windows() { // fix swappend x and y
-//     CONSOLE_SCREEN_BUFFER_INFO csbi;
-
-//     if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)) {
-//         int columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-//         int rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-        
-//         return std::make_tuple(rows, columns);
-//     }
-
-//     return std::make_tuple(-1, -1);
-// }
 
 void refreshScreen() {
     system("cls");
 }
 
 void printToScreen() {
-    // refreshScreen();
-    std::cout << std::endl;
+    refreshScreen();
 
     Letter* l = &firstLetter;
     
     while (l -> next) {
-        if (!l->deleted) { std::cout << l->value; }
+        if (l == cursorLocation) {
+
+            std::cout << l->value << ']';
+            
+        }
+
+
+        else if (!l->deleted) { std::cout << l->value; }
         
         l = l -> next;  
     }
 
-    if (!l->deleted) { std::cout << l->value; }
+    if (!l->deleted) { 
+        if (l == cursorLocation) { std::cout << l->value << ']'; } 
+        else { std::cout << l->value; }
+    }
 }
