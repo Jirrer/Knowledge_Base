@@ -1,0 +1,37 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="L9fV7j8l4KuJhznF8ZX1">
+    <mxGraphModel dx="971" dy="512" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="DhbcEWZdhcvLU54xW1-u-13" edge="1" parent="1" source="DhbcEWZdhcvLU54xW1-u-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="DhbcEWZdhcvLU54xW1-u-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DhbcEWZdhcvLU54xW1-u-2" parent="1" style="shape=actor;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="60" width="40" x="400" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="DhbcEWZdhcvLU54xW1-u-10" edge="1" parent="1" source="DhbcEWZdhcvLU54xW1-u-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="DhbcEWZdhcvLU54xW1-u-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DhbcEWZdhcvLU54xW1-u-11" edge="1" parent="1" source="DhbcEWZdhcvLU54xW1-u-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="DhbcEWZdhcvLU54xW1-u-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DhbcEWZdhcvLU54xW1-u-5" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Desktop App" vertex="1">
+          <mxGeometry height="80" width="80" x="380" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="DhbcEWZdhcvLU54xW1-u-12" edge="1" parent="1" source="DhbcEWZdhcvLU54xW1-u-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="DhbcEWZdhcvLU54xW1-u-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DhbcEWZdhcvLU54xW1-u-6" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="API" vertex="1">
+          <mxGeometry height="80" width="80" x="380" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="DhbcEWZdhcvLU54xW1-u-8" parent="1" style="shape=datastore;whiteSpace=wrap;html=1;" value="Local Storage" vertex="1">
+          <mxGeometry height="60" width="60" x="520" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="DhbcEWZdhcvLU54xW1-u-9" parent="1" style="shape=datastore;whiteSpace=wrap;html=1;" value="Cloud Storage" vertex="1">
+          <mxGeometry height="60" width="60" x="390" y="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
