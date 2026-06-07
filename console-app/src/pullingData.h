@@ -18,3 +18,6 @@ enum class DomainQueryType {
 };
 
 std::vector<Domain> pullDomains(DomainQueryType domainQueryType, std::optional<std::string> categoryInput = std::nullopt);
+bool removeFromDatabase(std::string title, std::string category);
+std::string pullContentFromKeys(std::string domainKey);
+bool insertIntoKeys(const std::tuple<std::string, std::string, std::string>& payload);

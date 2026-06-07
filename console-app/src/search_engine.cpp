@@ -4,7 +4,6 @@
 #include <algorithm> 
 #include <cctype>
 #include <iterator>
-#include "database.h"
 #include "double_metaphone.h"
 #include <sstream>
 #include "query.h"
@@ -12,8 +11,6 @@
 
 std::tuple<std::string, std::string> getMetephoneCode(const std::string& text);
 std::vector<std::string> tokenize(const std::string& text);
-std::vector<Domain> getAllDomains();
-std::vector<Domain> getDomainsByCategory(std::string category);
 std::vector<std::string> categoryQuery(const std::string& searchInput);
 std::vector<std::string> defaultQuery(const std::string& searchInput);
 
@@ -28,7 +25,6 @@ std::vector<std::string> queryKnowledgeBase(const std::string& searchInput, Quer
         default:
             // To-Do: fix
 
-
         std::vector<std::string> temp;
 
         return temp;
@@ -37,7 +33,7 @@ std::vector<std::string> queryKnowledgeBase(const std::string& searchInput, Quer
 }
 
 std::vector<std::string> defaultQuery(const std::string& searchInput) {
-    std::vector<Domain> allDomains = getAllDomains();
+    std::vector<Domain> allDomains = pullDomains(DomainQueryType::ALL);
     std::vector<std::string> searchWords = tokenize(searchInput);
 
     std::vector<std::tuple<std::string, int>> foundMatches;
@@ -88,34 +84,11 @@ std::vector<std::string> defaultQuery(const std::string& searchInput) {
     return output;
 }
 
-std::vector<Domain> getAllDomains() {
-    std::vector<std::tuple<std::string, std::string>> domainAndCategories = pullDomainAndCategories();
-
-    std::vector<Domain> output;
-
-    for (std::tuple<std::string, std::string> domainAndCategory : domainAndCategories) {
-        Domain procressedDomain;
-
-        procressedDomain.name = std::get<0>(domainAndCategory);
-
-        std::tuple<std::string, std::string> metephoneCodesPair = getMetephoneCode(procressedDomain.name);
-        
-        procressedDomain.category = std::get<1>(domainAndCategory);
-        procressedDomain.firstCode = std::get<0>(metephoneCodesPair);
-        procressedDomain.secondCode= std::get<1>(metephoneCodesPair);
-
-        output.push_back(procressedDomain);
-    }
-
-    return output;
-    
-}
-
 
 std::vector<std::string> categoryQuery(const std::string& searchInput) {
     std::string processedSearchInput = searchInput.substr(2); 
 
-    std::vector<Domain> domainsByCategory = getDomainsByCategory(processedSearchInput);
+    std::vector<Domain> domainsByCategory = pullDomains(DomainQueryType::CATEGORY, processedSearchInput);
 
 
     std::vector<std::string> output;
@@ -125,29 +98,6 @@ std::vector<std::string> categoryQuery(const std::string& searchInput) {
 
     return output;
 }
-
-std::vector<Domain> getDomainsByCategory(std::string category) { 
-    std::vector<std::tuple<std::string, std::string>> domainAndCategories = pullDomainAndCategoriesByCategory(category);
-
-    std::vector<Domain> output;
-
-    for (std::tuple<std::string, std::string> domainAndCategory : domainAndCategories) {
-        Domain procressedDomain;
-
-        std::tuple<std::string, std::string> metephoneCodesPair = getMetephoneCode("test");
-        
-        procressedDomain.name = std::get<0>(domainAndCategory);
-        procressedDomain.category = std::get<1>(domainAndCategory);
-        procressedDomain.firstCode = std::get<0>(metephoneCodesPair);
-        procressedDomain.secondCode= std::get<1>(metephoneCodesPair);
-
-        output.push_back(procressedDomain);
-    }
-
-    return output;
-    
-}
-
 
 std::tuple<std::string, std::string> getMetephoneCode(const std::string& text) {
     std::vector<std::string> codes;

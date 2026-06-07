@@ -5,12 +5,13 @@
 #include <string>
 #include <tuple>
 #include "query.h"
-#include "database.h"
 #include <cstdlib>
 #include "config.h"
 // #include "text_editor.h"
+#include "pullingData.h"
 
 bool isOnline = false;
+bool syncingStatus = false;
 
 enum User_Choice {
     exit_program,
@@ -38,9 +39,28 @@ bool pushChanges(std::string name, std::string category, std::vector<std::string
 void printHelpLibrary();
 void removeFromKnowledgeBase();
 bool checkValidTitleAndCategory(std::string title, std::string category);
+void printHeader();
 
 void clearTerminal() {
     std::system("cls");
+
+    printHeader();
+}
+
+void printHeader() {
+    std::cout << "Knowledge Base   |   ";
+    
+    if (isOnline) { 
+        std::cout << "Online"; 
+    }   else {
+        std::cout << "Offline";
+    }
+
+    if (syncingStatus) {
+        std::cout << "   |   *** Syncing ***" << std::endl << std::endl;
+    } else {
+        std::cout << std::endl << std::endl;
+    }
 }
 
 User_Choice getChoice(std::string choiceInput) {
