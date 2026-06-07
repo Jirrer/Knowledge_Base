@@ -84,7 +84,6 @@ std::vector<std::string> defaultQuery(const std::string& searchInput) {
     return output;
 }
 
-
 std::vector<std::string> categoryQuery(const std::string& searchInput) {
     std::string processedSearchInput = searchInput.substr(2); 
 
