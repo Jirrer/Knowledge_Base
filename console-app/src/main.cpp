@@ -7,7 +7,10 @@
 #include "query.h"
 #include "database.h"
 #include <cstdlib>
+#include "config.h"
 // #include "text_editor.h"
+
+bool isOnline = false;
 
 enum User_Choice {
     exit_program,
@@ -220,7 +223,7 @@ void showSelectedOutput(std::string domainName, std::vector<std::string> oldSear
     Direction_Choice choice = getDirectionChoice();
 
     if (choice == Direction_Choice::in) { return; }
-    // if (choice == Direction_Choice::out) { queryKnowledgeBase(oldSearchResults); }
+    if (choice == Direction_Choice::out) { showSearchResults(oldSearchResults); }
 }
 
 void addToKnowledgeBase() {

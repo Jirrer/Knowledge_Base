@@ -1,6 +1,6 @@
 #pragma once
 
-enum Query_Type {
+enum class Query_Type {
     DEFAULT,
     CATEGORY,
 };
