@@ -1,0 +1,139 @@
+{
+  "tables": [
+    {
+      "id": "nphILJ2tLaxecLVEyhRqM",
+      "name": "keys",
+      "x": -470,
+      "y": -219,
+      "locked": false,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": false,
+          "unsigned": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": "4cmLzZIq791TUFbtR9F6a"
+        },
+        {
+          "id": "xgSDcsOgJxz-_nbBJTeSG",
+          "name": "key",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": true,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": 65535
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#175e7a",
+      "collapsed": false
+    },
+    {
+      "id": "6j7mKYPblY3jdXTrdfLz9",
+      "name": "data",
+      "x": 6.999999999999886,
+      "y": -259,
+      "locked": false,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": false,
+          "unsigned": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": "7II-W253TFqK2sY0K90Hh"
+        },
+        {
+          "id": "BifGNZMk_KwP86KMs-XL1",
+          "name": "user_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "V9n_NxXxxhsx6q7ayj87E",
+          "name": "title",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": 65535
+        },
+        {
+          "id": "slLf-21qgfF5KuGwd5HpL",
+          "name": "category",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": 65535
+        },
+        {
+          "id": "V2l5KEUn1O8WaPe4aUEta",
+          "name": "content",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "",
+          "size": 65535
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#175e7a",
+      "collapsed": false
+    }
+  ],
+  "relationships": [
+    {
+      "startTableId": "6j7mKYPblY3jdXTrdfLz9",
+      "startFieldId": "BifGNZMk_KwP86KMs-XL1",
+      "endTableId": "nphILJ2tLaxecLVEyhRqM",
+      "endFieldId": "4cmLzZIq791TUFbtR9F6a",
+      "cardinality": "many_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "name": "data's user",
+      "id": "_jxBqYJwherOc-52UFfLj"
+    }
+  ],
+  "notes": [],
+  "subjectAreas": [],
+  "database": "sqlite",
+  "title": "Knowledge Base"
+}
