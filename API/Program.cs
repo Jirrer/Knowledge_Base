@@ -1,5 +1,8 @@
 
 
+using System.Data.Common;
+using SQLitePCL;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -20,13 +23,11 @@ app.MapGet("/Ping-Server", () => "Success");
 
 Database database = new();
 
-HashSet<string> keys = new HashSet<string> {"devkey"};
-
-app.MapGet("Pull-Data", (HttpContext context) =>
+app.MapGet("/Pull-Data", (HttpContext context) =>
 {
     var userKey = context.Request.Headers["key"].ToString();
 
-    if (!validateKey(userKey))
+    if (!database.ValidUser(userKey))
     {
         return Results.Unauthorized();
     }
@@ -37,12 +38,21 @@ app.MapGet("Pull-Data", (HttpContext context) =>
 
 });
 
-app.Run();
-
-
-bool validateKey(string potentialKey)
+app.MapPost("/Push-Data", (HttpContext context, List<Database_Entry> entries) =>
 {
-    return keys.Contains(potentialKey);
-}
+    var userKey = context.Request.Headers["key"].ToString();
+
+    if (!database.ValidUser(userKey))
+    {
+        return Results.Unauthorized();
+    }
+
+    database.InsertIntoData(userKey, entries);
+    
+
+    return Results.Created();
+});
+
+app.Run();
 
 record Database_Entry(int Id, string Title, string Category, string? Content);

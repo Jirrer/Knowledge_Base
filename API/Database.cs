@@ -30,7 +30,7 @@ class Database
             CREATE TABLE IF NOT EXISTS data (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
-                title TEXT NOT NULL,
+                title TEXT NOT NULL UNIQUE,
                 category TEXT NOT NULL,
                 content TEXT,
                 FOREIGN KEY (user_id) REFERENCES keys(id)
@@ -61,50 +61,60 @@ class Database
         }
     }
 
-    public void IntsertIntoData(int user_id, string title, string category, string content)
+    public void InsertIntoData(string userKey, List<Database_Entry> entries)
     {
         using var connection = new SqliteConnection(ConnectionString);
         connection.Open();
 
-        var command = connection.CreateCommand();
-        command.CommandText = @"
-            INSERT INTO data (user_id, title, category, content) 
-            VALUES ($user_id, $title, $category, $content)
-        ";
-        
-        command.Parameters.AddWithValue("$user_id", user_id);
-        command.Parameters.AddWithValue("$title", title);
-        command.Parameters.AddWithValue("$category", category);
-        command.Parameters.AddWithValue("$content", content);
+        using var transaction = connection.BeginTransaction();
 
         try
         {
-            command.ExecuteNonQuery();
-            Console.WriteLine($"Successfully inserted: {title}");
+            using var command = connection.CreateCommand();
+            command.CommandText = @"
+                INSERT OR REPLACE INTO data (user_id, title, category, content) 
+                VALUES (
+                    (SELECT id FROM keys WHERE key = $key),
+                    $title,
+                    $category,
+                    $content
+                )
+            ";
+
+            foreach (var entry in entries)
+            {
+                command.Parameters.Clear();
+                command.Parameters.AddWithValue("$key", userKey);
+                command.Parameters.AddWithValue("$title", entry.Title);
+                command.Parameters.AddWithValue("$category", entry.Category);
+                command.Parameters.AddWithValue("$content", entry.Content ?? (object)DBNull.Value);
+                command.ExecuteNonQuery();
+            }
+
+            transaction.Commit();
         }
-        catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+
+        catch
         {
-            Console.WriteLine($"Skipped: Data with title '{title}' already exists.");
+            transaction.Rollback();
+            throw;
         }
     }
+    
 
-    public List<string> PullKeys()
+    public bool ValidUser(string key)
     {
-        List<string> output = [];
-
         using var connection = new SqliteConnection("Data Source=dev.db");
         connection.Open();
 
         using var command = connection.CreateCommand();
-        command.CommandText = "SELECT key FROM keys";
+        command.CommandText = "SELECT id from keys where key = ($key)";
+
+        command.Parameters.AddWithValue("$key", key);
 
         using var reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            output.Add(reader.GetString(0));
-        }
-
-        return output;
+        
+        return reader.Read();
     }
 
     public List<Database_Entry> PullData(string userKey)
