@@ -52,17 +52,28 @@ void openEditor() {
                 break;
             
             case 75: // Left Arrow
-                if (cursorLocation->prev && !cursorLocation->prev->deleted) {
+                do {
+                    if (!cursorLocation->prev) {
+                        break;
+                    }
                     cursorLocation = cursorLocation->prev;
-                }
+
+                } while (cursorLocation->deleted && cursorLocation->prev != nullptr);
 
                 break;
 
 
             case 77: // Right Arrow
-                if (cursorLocation->next && !cursorLocation->prev->deleted) {
+                do {
+                    if (!cursorLocation->next) {
+                        break;
+                    }
+
                     cursorLocation = cursorLocation->next;
-                }
+
+                } while (cursorLocation->deleted && cursorLocation->next != nullptr);
+
+                break;
 
                 break;
         
