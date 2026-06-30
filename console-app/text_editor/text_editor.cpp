@@ -74,9 +74,7 @@ void openEditor() {
                 } while (cursorLocation->deleted && cursorLocation->next != nullptr);
 
                 break;
-
-                break;
-        
+       
             default:
                 Letter* newLetter = new Letter(charInput, cursorLocation);
 
@@ -94,7 +92,7 @@ void openEditor() {
 
 
 void refreshScreen() {
-    system("cls");
+    std::cout << std::string(100, '\n');
 }
 
 void printToScreen() {
