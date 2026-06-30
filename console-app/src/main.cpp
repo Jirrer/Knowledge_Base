@@ -7,7 +7,6 @@
 #include "query.h"
 #include <cstdlib>
 #include "config.h"
-// #include "text_editor.h"
 #include "pullingData.h"
 
 bool isOnline = false;
@@ -257,12 +256,11 @@ void addToKnowledgeBase() {
     std::cout << "Enter Category: ";
     std::getline(std::cin, category);
 
-    std::cout << "Enter Text content (enter '.' to end) -->" << std::endl;
+    std::cout << "Continue to Text content -->" << std::endl;
+
+    std::system("edit temp_submission.txt");
     
-    std::string line;
-    while (std::getline(std::cin, line) && line != ".") {
-        text.push_back(line);
-    }
+    return;
  
     if (pushChanges(name, category, text)) { std::cout << "Successfully Added" << std::endl; }
     else { std::cout << "Error Trying to Add" << std::endl; }
