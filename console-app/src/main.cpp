@@ -7,7 +7,6 @@
 #include "query.h"
 #include <cstdlib>
 #include "config.h"
-// #include "text_editor.h"
 #include "pullingData.h"
 
 bool isOnline = false;
@@ -35,11 +34,12 @@ void loadDotEnv(const std::string& filename);
 void showSearchResults(std::vector<std::string> searchResults);
 void showSelectedOutput(std::string domainName, std::vector<std::string> oldSearchResults);
 void addToKnowledgeBase();
-bool pushChanges(std::string name, std::string category, std::vector<std::string> text);
+bool pushChanges(std::string name, std::string category, std::string text);
 void printHelpLibrary();
 void removeFromKnowledgeBase();
 bool checkValidTitleAndCategory(std::string title, std::string category);
 void printHeader();
+std::string readTempContentFile();
 
 void clearTerminal() {
     std::system("cls");
@@ -249,7 +249,6 @@ void showSelectedOutput(std::string domainName, std::vector<std::string> oldSear
 void addToKnowledgeBase() {
     std::string name;
     std::string category;
-    std::vector<std::string> text;
 
     std::cout << "Enter Title: ";
     std::getline(std::cin, name);
@@ -257,35 +256,45 @@ void addToKnowledgeBase() {
     std::cout << "Enter Category: ";
     std::getline(std::cin, category);
 
-    std::cout << "Enter Text content (enter '.' to end) -->" << std::endl;
-    
-    std::string line;
-    while (std::getline(std::cin, line) && line != ".") {
-        text.push_back(line);
-    }
+    std::cout << "Continue to Text content -->" << std::endl;
+
+    std::system("edit temp_submission.txt");
  
-    if (pushChanges(name, category, text)) { std::cout << "Successfully Added" << std::endl; }
+    if (pushChanges(name, category, readTempContentFile())) { std::cout << "Successfully Added" << std::endl; }
     else { std::cout << "Error Trying to Add" << std::endl; }
 
 
     if (getDirectionChoice()) { return; }
 }
 
-bool pushChanges(std::string name, std::string category, std::vector<std::string> text) {
-    if (name.empty()) { return false; }
+std::string readTempContentFile() {
+    std::ifstream file("temp_submission.txt");
 
-    std::string content;
-
-    if (text.empty()) {
-        content = "No Content to Show";
-    } else {
-        content = text[0];
-        for (size_t i = 1; i < text.size(); i++) {
-            content += "\n" + text[i];
-        }
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file.\n";
+        exit(1);
     }
 
-    std::tuple<std::string, std::string, std::string> payload(name, category, content);
+    std::string output = "";
+
+    std::string line;
+    while (std::getline(file, line)) {
+        output += line + "\n";
+    }
+
+    file.close(); 
+    
+    return output;
+}
+
+bool pushChanges(std::string name, std::string category, std::string text) {
+    if (name.empty()) { return false; }
+
+    if (text.empty()) {
+        text = "No Content to Show";
+    } 
+
+    std::tuple<std::string, std::string, std::string> payload(name, category, text);
 
     return insertIntoKeys(payload);
 }
