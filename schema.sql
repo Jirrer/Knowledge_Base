@@ -1,14 +1,4 @@
-CREATE TABLE IF NOT EXISTS "keys" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"key" TEXT NOT NULL UNIQUE
-);
-
-CREATE TABLE IF NOT EXISTS "data" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"user_id" INTEGER NOT NULL,
-	"title" TEXT NOT NULL UNIQUE,
-	"category" TEXT NOT NULL,
-	"content" TEXT,
-	FOREIGN KEY ("user_id") REFERENCES "keys"("id")
-	ON UPDATE NO ACTION ON DELETE NO ACTION
-);
+CREATE TABLE keys(
+ID INTEGER PRIMARY KEY AUTOINCREMENT,
+domain TEXT unique, 'category' text, content text);
+CREATE TABLE sqlite_sequence(name,seq);
